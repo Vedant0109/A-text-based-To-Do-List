@@ -1,35 +1,37 @@
 import json
 import time
-from plyer import notification
-choice= None
+
+choice = None
 
 def create_new_task() -> None:
     Task_Person_Name = input("Enter your Name: ")
     Task_Name = input("Enter The Task Name: ")
-    Task_Discription = input("Enter the task Description: ")
-    priotity_task_deadline = input("Enter the Task Deadline in hours: ")
+    Task_Description = input("Enter the Task Description: ")
+    priority_task_deadline = input("Enter the Task Deadline in hours: ")
 
-    # Incremental roll_no
+    # Load existing tasks or initialize an empty list if the file doesn't exist
     try:
         with open("db.json", "r") as file:
             tasks = json.load(file)
     except (FileNotFoundError, json.JSONDecodeError):
         tasks = []
 
+    # Incremental roll_no
     roll_no = len(tasks) + 1
 
     # New task dictionary
     task = {
         "person_name": Task_Person_Name,
         "task_name": Task_Name,
-        "task_description": Task_Discription,
-        "deadline": int(priotity_task_deadline),
+        "task_description": Task_Description,
+        "deadline": int(priority_task_deadline),
         "roll_no": roll_no
     }
 
     # Append the new task to the list
     tasks.append(task)
-
+    
+    tasks = sorted(tasks, key=lambda x: x['deadline'], reverse=True)
     # Write the entire updated list back to the JSON file
     with open("db.json", "w") as outfile:
         json.dump(tasks, outfile, indent=4)
@@ -37,85 +39,90 @@ def create_new_task() -> None:
     print("Task added successfully!")
 
 
-    """Load tasks from the JSON file."""
 
-    with open("db.json", "r") as file:
-        tasks = json.load(file)
+def set_the_current_task() -> None:
+    # Load tasks
+    try:
+        with open("db.json", "r") as file:
+            tasks = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("No tasks found. Please create a new task first.")
+        return
 
-    # Sort tasks by deadline in descending order (largest deadline first)
-    sorted_tasks = sorted(tasks, key=lambda x: x['deadline'], reverse=True)
-    
-def set_the_current_task () -> None:
-    # intialzing a empty list
-    curreant_task = []
-    # Setting up Credentials
-    with open("db.json", "r") as file:
-        tasks = json.load(file)
-        taks=tasks[0]
-        task= taks["task_name"]
-        
     Task_Name = input("Enter the Task name: ")
-    if Task_Name != task:
-        while Task_Name!= task:
-            print("Task not found")
-            Task_Name=input("Re-Enter your Task: ")
-    
-    Time = float(input("Time in hr (which you want to give to this project): "))
-    # Checking if the Task discription is opted by the user 
+    task_found = next((task for task in tasks if task["task_name"] == Task_Name), None)
 
-    curreant_task.append(Task_Name)
-    print(f"Your task started You have time for {Time} hours")
-    Time= Time*3600
-    time.sleep(Time)
-    print("Your time over for this task")
+    if task_found:
+        Time = float(input("Time in hr (which you want to give to this project): "))
+        print(f"Your task '{Task_Name}' started. You have {Time} hours.")
+        time.sleep(Time * 3600)  # Convert hours to seconds for sleep
+        print("Your time is over for this task.")
+    else:
+        print("Task not found.")
+
 
 def modifying_the_current_task() -> None:
-  counter =  0
-  user_input = input("What do u want to change\n Enter (deadline) to change deadline: ").lower()
-  final_input = user_input.lower()
-  if user_input == "deadline":
-     new_deadline = input("whats the new deadline: ")
-     with open ("db.json","w") as f:
-        lines = f.readlines()
-     for line in lines:
-        if line == Task_Need_to_Change_name:
-          counter.pop(counter)
-          f.writelines(counter, new_deadline)
+    try:
+        with open("db.json", "r") as file:
+            tasks = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("No tasks found. Please create a new task first.")
+        return
+
+    task_name = input("Enter the task name to modify: ")
+    task_found = next((task for task in tasks if task["task_name"] == task_name), None)
+
+    if task_found:
+        user_input = input("Enter 'deadline' to change the deadline: ").lower()
+        if user_input == "deadline":
+            new_deadline = int(input("Enter the new deadline in hours: "))
+            task_found["deadline"] = new_deadline
+
+            with open("db.json", "w") as file:
+                json.dump(tasks, file, indent=4)
+
+            print("Task deadline updated successfully!")
         else:
-          counter +=1
+            print("Invalid option.")
+    else:
+        print("Task not found.")
+
 
 def delete_the_task() -> None:
-  counter = 0
-  user_input = input("what task u want to deleate Specify it by NAME: ")
-  final_user_input = user_input.lower()
-  while True:
-    with open ("db.json","r") as f:
-      lines =  f.readlines()
-      if user_input == final_user_input:
-          with open ("db.json","a") as w:
-            writing = w.writelines()
-            writing[counter].pop
-      else:
-         counter +=1
+    try:
+        with open("db.json", "r") as file:
+            tasks = json.load(file)
+    except (FileNotFoundError, json.JSONDecodeError):
+        print("No tasks found. Please create a new task first.")
+        return
+
+    task_name = input("Enter the task name to delete: ")
+    tasks = [task for task in tasks if task["task_name"] != task_name]
+
+    with open("db.json", "w") as file:
+        json.dump(tasks, file, indent=4)
+
+    print("Task deleted successfully!")
 
 
-### create more functions for new things
+task_list = [create_new_task, set_the_current_task, modifying_the_current_task, delete_the_task]
 
-while choice != "q":
-  print("Enter 1 for creating new task\nEnter 2 for setting the current task\nEnter 3 for changing the current task\nEnter 4 for deleting the task: ")
-  choice=input("Enter: ")
+while choice != "5":
+    print("\nEnter 1 for creating a new task")
+    print("Enter 2 for setting the current task")
+    print("Enter 3 for modifying the current task")
+    print("Enter 4 for deleting a task")
+    print("Enter 5 to quit")
 
-  if choice=="1":
-    create_new_task()
+    choice = input("Enter: ")
 
-  elif choice=="2":
-    set_the_current_task()
-
-  elif choice=="3":
-    modifying_the_current_task()
-
-  elif choice=="4":
-    delete_the_task()
-
-  else:
-    print("Invalid input")
+    if choice == "5":
+        break
+    try:
+        choice = int(choice) - 1
+        if 0 <= choice < len(task_list):
+            task_list[choice]()
+        else:
+            print("Please choose a valid option.")
+    except ValueError:
+        print("Please enter a number (1-5).")
