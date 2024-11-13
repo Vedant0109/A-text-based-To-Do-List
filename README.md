@@ -1,3 +1,10 @@
+I have a made a basic To-Do-List program which can perform following tasks:
+- Add a task
+- Start a task for specific time
+- delete a task
+- modify a task
+
+
 ## Contributors
 
 Thanks to the following contributor:
