@@ -1,4 +1,1 @@
-## Contributors
-
-You can view the list of contributors on 
-[GitHub](https://github.com/Vedant0109/Codewars-problems/graphs/contributors).
+[![All Contributors](https://img.shields.io/badge/all_contributors-1-orange.svg)](https://allcontributors.org)
