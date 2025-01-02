@@ -1,8 +1,8 @@
 [tool.poetry]
-name = "python-template"
+name = "To-Do-List"
 version = "0.1.0"
-description = ""
-authors = ["Your Name <you@example.com>"]
+description = "Simple Text Based To-Do-List"
+authors = ["Vedant0109"]
 
 [tool.poetry.dependencies]
 python = ">=3.10.0,<3.12"
